@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<link rel="stylesheet" type="text/css" href="index.css">
+<link rel="stylesheet" type="text/css" href="sign.css">
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD0kMRRmZhe1pG3zf_YfHSNinl95VaeC3M",
+        authDomain: "sparta-19e40.firebaseapp.com",
+        projectId: "sparta-19e40",
+        storageBucket: "sparta-19e40.appspot.com",
+        messagingSenderId: "354988879759",
+        appId: "1:354988879759:web:4dc0c69716672558ed65fa",
+        measurementId: "G-ZLBZ15M0HG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    function checkPasswordMatch() {
+        const password = $('#password').val();
+        const repassword = $('#repassword').val();
+        const MatchMessage = document.getElementById("MatchMessage");
+        const signupButton = document.getElementById("signupButton");
+        if (password.length < 4 || password.length > 10) {
+            MatchMessage.textContent = "4 ~ 10자리 이내로 입력해주세요.";
+            MatchMessage.style.color = "red";
+            signupButton.disabled = true;
+        } else {
+            if (password !== repassword) {
+                MatchMessage.textContent = "비밀번호가 일치하지 않습니다.";
+                MatchMessage.style.color = "red";
+                signupButton.disabled = true; // 비밀번호 불일치 시 회원가입 버튼 비활성화
+            } else {
+                MatchMessage.textContent = "비밀번호가 일치합니다.";
+                MatchMessage.style.color = "green";
+                signupButton.disabled = false;
+            }
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // 비밀번호 입력란과 비밀번호 확인 입력란에 입력이 발생할 때마다 비밀번호 일치 여부 확인
+        $('#password').on('input', checkPasswordMatch);
+        $('#repassword').on('input', checkPasswordMatch);
+    });
+
+    $("#signupButton").click(async function () {
+        let id = $('#id').val();
+        let nickname = $('#nickname').val();
+        let password = $('#password').val();
+        let repassword = $('#repassword').val();
+
+        if (id.length == 0) {
+            alert("아이디 입력해주세요.");
+            return;
+        }
+
+        let membersDb = await getDocs(collection(db, "members"));
+
+        // 배열이 비어 있는지 확인
+        if (membersDb.length === 0) {
+            return;
+        }
+
+        // 유효한 문서에 대해서만 처리
+        let checking = 0;
+        membersDb.forEach(e => {
+            if (e) { // 요소가 유효한지 확인
+                let row = e.data();
+                let idcheck = row['id'];
+
+                if (id == idcheck) {
+                    checking = 1;
+                    return;
+                }
+            }
+        });
+
+        if (checking == 1) {
+            alert("중복된 아이디가 있습니다.");
+            return;
+        }
+
+        let doc = {
+            'id': id,
+            'nickname': nickname,
+            'password': password,
+        };
+        await addDoc(collection(db, "members"), doc);
+        alert('회원가입 완료!');
+        window.location.href = './login.html';
+    });
+</script>
+
+
+<body>
+    <div class="iphone">
+        <div class="screen">
+            <div class="container">
+                <h1> 당신은 어디까지 <br>알고 계시나요?</h1>
+            </div>
+            <div class="container">
+                <form>
+                    <input type="text" name="username" id="id" placeholder="아이디"><br>
+                    <input type="text" name="nickname" id="nickname" placeholder="닉네임"><br>
+                    <input type="password" name="password" id="password" placeholder="비밀번호"><br>
+                    <input type="password" name="repassword" id="repassword" placeholder="비밀번호 확인"><br>
+                    <span id="MatchMessage"></span><br>
+                    <button type="button" id="signupButton">회원가입</button>
+                </form>
+            </div>
+        </div>
+        <div class="notch">
+            <div class="camera"></div>
+            <div class="speaker"></div>
+        </div>
+    </div>
+</body>
+
+</html>

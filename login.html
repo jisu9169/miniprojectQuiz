@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<link rel="stylesheet" type="text/css" href="index.css">
+<link rel="stylesheet" type="text/css" href="login.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD0kMRRmZhe1pG3zf_YfHSNinl95VaeC3M",
+        authDomain: "sparta-19e40.firebaseapp.com",
+        projectId: "sparta-19e40",
+        storageBucket: "sparta-19e40.appspot.com",
+        messagingSenderId: "354988879759",
+        appId: "1:354988879759:web:4dc0c69716672558ed65fa",
+        measurementId: "G-ZLBZ15M0HG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    function checkPasswordMatch() {
+        const password = $('#password').val();
+        const MatchMessage = document.getElementById("MatchMessage");
+        const loginButton = document.getElementById("loginButton");
+        if (password.length < 4 || password.length > 10) {
+            MatchMessage.textContent = "4 ~ 10자리 이내로 입력해주세요.";
+            MatchMessage.style.color = "red";
+            loginButton.disabled = true;
+        } // 비밀번호 불일치 시 회원가입 버튼 비활성화
+        else {
+            MatchMessage.textContent = "";
+            loginButton.disabled = false;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // 비밀번호 입력란과 비밀번호 확인 입력란에 입력이 발생할 때마다 비밀번호 일치 여부 확인
+        $('#password').on('input', checkPasswordMatch);
+    });
+
+    $("#loginButton").click(async function () {
+        let id = $('#id').val();
+        let password = $('#password').val();
+        let nickname ="";
+
+        let membersDb = await getDocs(collection(db, "members"));
+        if (membersDb.length === 0) {
+            return;
+        }
+        let loginChecking = 0;
+        membersDb.forEach(e => {
+            if (e) { // 요소가 유효한지 확인
+                let row = e.data();
+                let dbId = row['id'];
+                let dbPassword = row['id'];
+
+                if (dbId == id && dbPassword == password) {
+                    loginChecking = 1;
+                    nickname = row['nickname'];
+                    return;
+                }
+            }
+        });
+
+        if (loginChecking == 0) {
+            alert("로그인 실패하였습니다.");
+            return;
+        }
+        localStorage.setItem('id', id);
+        localStorage.setItem('nickname', nickname);
+        window.location.href = './index.html';
+    });
+</script>
+
+<body>
+    <div class="iphone">
+        <div class="screen">
+            <div class="container">
+                <h1> 당신은 어디까지 <br>알고 계시나요?</h1>
+            </div>
+            <div class="container">
+                <form>
+                    <input type="text" name="username" id="id" placeholder="아이디"><br>
+                    <input type="password" name="password" id="password" placeholder="비밀번호"><br>
+                    <span id="MatchMessage"></span><br>
+                    <button type="button" id="loginButton">로그인</button>
+                </form>
+            </div>
+            <div class="container">
+                <a href="sign.html" id="signUp">처음이신가요? 회원가입</a>
+            </div>
+        </div>
+        <div class="notch">
+            <div class="camera"></div>
+            <div class="speaker"></div>
+        </div>
+    </div>
+</body>
+
+</html>

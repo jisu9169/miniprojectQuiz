@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<link rel="stylesheet" type="text/css" href="index.css">
+
+<script>
+    let id = localStorage.getItem('id');
+    let nickname = localStorage.getItem('nickname');
+
+    console.log(id);
+    console.log(nickname);
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let id = localStorage.getItem('id');
+        let nickname = localStorage.getItem('nickname');
+
+        let loginLink = document.getElementById('login');
+        let logoutLink = document.getElementById('logout');
+        let todayQuiz = document.getElementById('todayQuiz');
+
+        if (id) {
+            document.getElementById('nick').innerText = nickname + " 님";
+            loginLink.style.display = 'none'; // 로그인 링크 숨기기
+            logoutLink.style.display = 'block'; // 로그아웃 링크 보이기
+            todayQuiz.href = "quiz.html";
+        } else {
+            loginLink.style.display = 'block'; // 로그인 링크 보이기
+            logoutLink.style.display = 'none'; // 로그아웃 링크 숨기기
+            todayQuiz.href = "login.html";
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let logoutLink = document.getElementById('logout');
+
+        logoutLink.addEventListener('click', function (event) {
+            event.preventDefault(); // 링크의 기본 동작 방지
+
+            // 로그아웃 시 스토리지에서 아이디와 닉네임 삭제
+            localStorage.removeItem('id');
+            localStorage.removeItem('ncikname');
+
+            // 로그인 페이지로 이동
+            window.location.href = './login.html';
+        });
+    });
+</script>
+
+<body>
+    <div class="iphone">
+        <div class="screen">
+            <div class="container">
+                <h1> 당신은 어디까지 <br>알고 계시나요?</h1>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <a id="todayQuiz">오늘의 <br>상식 퀴즈</a>
+                </div>
+                <div class="row">
+                    <a href="rank.html" id="rank">나의 랭킹/<br>레벨</a>
+                </div>
+            </div>
+            <span id="nick"></span>
+            <div class="container">
+                <a href="./login.html" id="login">로그인</a>
+                <a href="./index.html" id="logout">로그아웃</a>
+            </div>
+        </div>
+        <div class="notch">
+            <div class="camera"></div>
+            <div class="speaker"></div>
+        </div>
+    </div>
+</body>
+
+</html>

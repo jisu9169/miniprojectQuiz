@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" type="text/css" href="quiz.css">
+</head>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD0kMRRmZhe1pG3zf_YfHSNinl95VaeC3M",
+        authDomain: "sparta-19e40.firebaseapp.com",
+        projectId: "sparta-19e40",
+        storageBucket: "sparta-19e40.appspot.com",
+        messagingSenderId: "354988879759",
+        appId: "1:354988879759:web:4dc0c69716672558ed65fa",
+        measurementId: "G-ZLBZ15M0HG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let id = localStorage.getItem('id');
+    let nickname = localStorage.getItem('nickname');
+    let url = "https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple";
+    let results = [];
+    let currentQuestionIndex = 0;
+    let answered = false;
+    let answerCount = 0;
+
+
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            results = data.results;
+            showNextQuestion();
+        })
+        .catch(error => console.error("Error fetching data:", error));
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function showNextQuestion() {
+        let questionContainer = document.getElementById("question");
+        let answerContainer = document.getElementById("answer");
+        questionContainer.innerHTML = ""; // 이전 문제 삭제
+        answerContainer.innerHTML = "";
+
+        answered = false; // 선택 초기화
+
+        if (currentQuestionIndex < results.length) {
+            let result = results[currentQuestionIndex];
+            let question = result.question;
+            let correctAnswer = result.correct_answer;
+            let incorrectAnswers = result.incorrect_answers;
+
+            // 문제를 직접 questionContainer에 추가
+            let questionText = document.createElement("p");
+            questionText.textContent = question;
+            questionContainer.appendChild(questionText);
+
+            let optionsList = document.createElement("ul");
+            let options = [correctAnswer, ...incorrectAnswers];
+            options = shuffleArray(options);
+
+            options.forEach((option) => {
+                let optionItem = document.createElement("li");
+                optionItem.textContent = option;
+                optionItem.addEventListener("click", function () {
+                    if (!answered) {
+                        answered = true;
+                        if (option === correctAnswer) {
+                            answerCount++;
+                            optionItem.classList.add("correct");
+                            // 올바른 답인 경우, 나머지 선택지 비활성화
+                            optionsList.querySelectorAll('li').forEach(item => {
+                                if (item.textContent !== correctAnswer) {
+                                    item.style.pointerEvents = 'none';
+                                }
+                            });
+                        } else {
+                            // 틀린 경우, 올바른 답을 초록색으로 표시하고 선택지 비활성화
+                            optionsList.querySelectorAll('li').forEach(item => {
+                                if (item.textContent === correctAnswer) {
+                                    item.classList.add("correct");
+                                }
+                                item.style.pointerEvents = 'none';
+                            });
+                            optionItem.classList.add("incorrect");
+                        }
+                    }
+                });
+                optionsList.appendChild(optionItem);
+            });
+
+            answerContainer.appendChild(optionsList);
+
+        } else {
+            questionContainer.innerHTML = "맞은 문제 수 : " + answerCount + " 개 ";
+            let recordButton = document.getElementById("quizButton");
+            recordButton.id = ""; // "record" 버튼의 ID 제거
+            recordButton.textContent = "기록하기";
+            recordButton.addEventListener("click", recordResults);
+        }
+        currentQuestionIndex++;
+    }
+
+    $("#quizButton").click(async function () {
+        showNextQuestion();
+    });
+
+    function recordResults() {
+        let doc = {
+            'id': id,
+            'nickname': nickname,
+            'answer': answerCount,
+        };
+        addDoc(collection(db, "ranks"), doc)
+            .then(() => {
+                window.location.href = "rank.html"; // rank.html로 이동
+            })
+            .catch(error => console.error("Error recording results:", error));
+    }
+</script>
+
+<body>
+    <div class="iphone">
+        <div class="screen">
+            <div class="container">
+                <h1> 당신은 어디까지 <br>알고 계시나요?</h1>
+            </div>
+            <div class="container" id="question">
+            </div>
+            <div class="container" id="answer">
+            </div>
+            <button id="quizButton">next</button>
+        </div>
+        <div class="notch">
+            <div class="camera"></div>
+            <div class="speaker"></div>
+        </div>
+    </div>
+</body>
+
+</html>

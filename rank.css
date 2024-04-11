@@ -1,0 +1,101 @@
+#rankingContainer {
+     /* 각 div 요소 사이에 간격을 조절하기 위해 마진 설정 */
+    display: flex; /* Flexbox 사용 */
+    align-items: center;
+    margin-top: 20px;
+    justify-content: center; /*가로 가운데 정렬 */
+    flex-direction: column; /* 요소들을 수직으로 배치 */
+}
+
+#rankingContainer img:nth-of-type(1) {
+    height: 100px;
+}
+
+#rankingContainer img:nth-of-type(2) {
+    height: 80px;
+}
+#rankingContainer img:nth-of-type(3) {
+    height: 70px;
+}
+#rankingContainer p:nth-of-type(1) {
+    font-size: 25px; /* 첫 번째 p 요소에 적용될 폰트 크기 */
+}
+
+#rankingContainer p:nth-of-type(2) {
+    font-size: 20px; /* 두 번째 p 요소에 적용될 폰트 크기 */
+}
+
+#rankingContainer p:nth-of-type(3) {
+    font-size: 15px; /* 세 번째 p 요소에 적용될 폰트 크기 */
+}
+
+/* #rankingContainer p:nth-of-type(4) {
+    font-size: 13px;  네 번째 p 요소에 적용될 폰트 크기
+}
+
+#rankingContainer p:nth-of-type(5) {
+    font-size: 13px;  다섯 번째 p 요소에 적용될 폰트 크기 
+} */
+
+#userScoreContainer p {
+    text-align: center;
+}
+
+#userScoreContainer p:hover {
+    transform: scale(1.1);
+    transition: all 0.4s;
+    font-weight: 600;
+}
+
+.grade {
+    margin-right: 10px;
+    font-size: 10px;
+}
+
+.nick{
+    font-weight: 400;
+    font-size: 25px;
+    margin-right: 20px;
+}
+
+#index {
+    color: black;
+    padding: 15px 20px;
+    margin: -20px auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0px 5px 5px #33333340;
+    text-decoration: none;
+    display: inline-block; /* 링크를 블록 레벨 요소로 변환합니다. */
+}
+
+#index:hover {
+    transform: scale(1.2);
+    transition: all 0.4s;
+    font-weight: 600;
+}
+
+#index:hover {
+    transform: scale(1.2);
+    transition: all 0.4s;
+    font-weight: 600;
+}
+
+.screen {
+    text-align: center;
+}
+
+#rankingContainer p:nth-of-type(1) span {
+    padding-right: 20px;
+    font-size: 20px;
+}
+
+#rankingContainer p:nth-of-type(2) span {
+    padding-right: 30px;
+    font-size: 15px;
+}
+#rankingContainer p:nth-of-type(3) span {
+    padding-right: 40px;
+    font-size: 10px;
+}
+

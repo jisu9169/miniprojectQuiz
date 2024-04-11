@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" type="text/css" href="quiz.css">
+</head>
+
+<body>
+    <div class="iphone">
+        <div class="screen">
+            <div class="container">
+                <h1> 당신은 어디까지 <br>알고 계시나요?</h1>
+            </div>
+            <div class="container" id="question">
+            </div>
+            <div class="container" id="answer">
+            </div>
+            <button onclick="showNextQuestion()">다음</button>
+        </div>
+        <div class="notch">
+            <div class="camera"></div>
+            <div class="speaker"></div>
+        </div>
+    </div>
+
+    <script>
+        let url = "https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple";
+        let results = [];
+        let currentQuestionIndex = 0;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                results = data.results;
+                showNextQuestion();
+            })
+            .catch(error => console.error("Error fetching data:", error));
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function showNextQuestion() {
+            let questionContainer = document.getElementById("question");
+            let answerContainer = document.getElementById("answer");
+            questionContainer.innerHTML = ""; // 이전 문제 삭제
+            answerContainer.innerHTML = "";
+
+            if (currentQuestionIndex < results.length) {
+                let result = results[currentQuestionIndex];
+                let question = result.question;
+                let correctAnswer = result.correct_answer;
+                let incorrectAnswers = result.incorrect_answers;
+
+                // 문제를 직접 questionContainer에 추가
+                let questionText = document.createElement("p");
+                questionText.textContent = question;
+                questionContainer.appendChild(questionText);
+
+                let optionsList = document.createElement("ul");
+                let options = [correctAnswer, ...incorrectAnswers];
+                options = shuffleArray(options);
+
+                options.forEach((option) => {
+                    let optionItem = document.createElement("li");
+                    optionItem.textContent = option;
+                    optionItem.addEventListener("click", function () {
+                        if (option === correctAnswer) {
+                            optionItem.classList.add("correct");
+                        } else {
+                            optionItem.classList.add("incorrect");
+                        }
+                    });
+                    optionsList.appendChild(optionItem);
+                });
+
+                answerContainer.appendChild(optionsList);
+
+            } else {
+                questionContainer.innerHTML = "더 이상 문제가 없습니다.";
+            }
+            currentQuestionIndex++;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<link rel="stylesheet" type="text/css" href="index.css">
+<link rel="stylesheet" type="text/css" href="rank.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<body>
+    <div class="iphone">
+        <div class="screen">
+            <div id="rankingContainer">
+                <h2>Top 5</h2>
+            </div>
+            <div id="userScoreContainer">
+                <hr>
+            </div>
+            <a href="./index.html" id="index">처음화면</a>
+        </div>
+        <div class="notch">
+            <div class="camera"></div>
+            <div class="speaker"></div>
+        </div>
+    </div>
+</body>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD0kMRRmZhe1pG3zf_YfHSNinl95VaeC3M",
+        authDomain: "sparta-19e40.firebaseapp.com",
+        projectId: "sparta-19e40",
+        storageBucket: "sparta-19e40.appspot.com",
+        messagingSenderId: "354988879759",
+        appId: "1:354988879759:web:4dc0c69716672558ed65fa",
+        measurementId: "G-ZLBZ15M0HG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 사용자의 ID를 정의합니다.
+    let userId = localStorage.getItem('id');
+    let nickname = localStorage.getItem('nickname');
+
+    async function fetchUserRankInfo() {
+        let rankingContainer = document.getElementById("rankingContainer");
+        let userScoreContainer = document.getElementById("userScoreContainer");
+
+        // 상위 5명의 랭킹 정보 가져오기
+        let ranksDb = await getDocs(collection(db, "ranks"));
+
+        let dataArray = [];
+        ranksDb.forEach(doc => {
+            dataArray.push(doc.data());
+        });
+        
+        // 각 랭킹 아이템에 닉네임과 점수 추가
+        dataArray.sort((a,b) => b.answer - a.answer);
+
+        let is = false;
+        let highestScore = 0;
+        let grade = 0;
+
+        console.log(dataArray);
+        for (let index = 0; index < dataArray.length; index++) {
+            let element = dataArray[index];
+            if (element['id'] == userId && !is) {
+                highestScore = element['answer'];
+                grade = index + 1;
+                is = true;
+            }
+            if (index < 3) {
+                let temp_html = `<img src="img/${index + 1}.png"><p> 닉네임 : ${element.nickname} <span> 님</span>  점수 : ${element.answer} <span> 점</span></p>`;
+                $('#rankingContainer').append(temp_html);
+            }
+
+            if (index >= 5 && is) {
+                break;
+            }
+        }
+        // 사용자의 최고 점수를 보여줌
+        let temp_html =`<p>닉네임 : <span class="nick">${nickname}</span> ${highestScore} <span class="grade"> 점</span> ${grade} <span class="grade">등</span> </p>`;
+        $('#userScoreContainer').append(temp_html);
+    }
+
+    fetchUserRankInfo();
+</script>
+
+</html>
